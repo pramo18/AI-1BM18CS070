@@ -1,148 +1,154 @@
-import copy
 
-class XO:
-    def opp_sign(self, sign):
-        return 'O' if sign == 'X' else 'X' 
+       
+     from random import randint
 
-class Board:
-    def __init__(self, size):
-        self.s = size
-        self.q = size*size
-        self.empty = [i for i in range(self.q)]
-        self.grid = ['.'] * self.q
-    def ins(self, move, sign):
-        self.grid[move] = sign
-        self.empty = [i for i in self.empty if i != move]
-    def is_full(self):
-        return not len(self.empty)
-    def get_col(self, col):
-        return [self.grid[i] for i in range(col-1, self.q, self.s)] 
-    def get_row(self, row):
-        return self.grid[(row-1)*self.s:row*self.s] 
-    def get_diag1(self):
-        return [self.grid[i] for i in range(0, self.q, self.s+1)] 
-    def get_diag2(self):
-        return [self.grid[i] for i in range(self.s-1, self.q, self.s-1)][:-1] 
-    def __str__(self):
-        return '\n'.join([' '.join(map(str,self.grid[i:i+self.s])) 
-                for i in range(0, self.q, self.s)]) + '\n'
-    
-class Tree:
-    def find_best_move(self,board,depth,sign):
-        """
-    
-        :param board:
-        :return:
-        """
-        if (board.empty==[]): return None
-    
-        best_move=-(2**(board.s**2))
-        m=board.empty[0]
-        for move in board.empty:
-            b=copy.deepcopy(board)
-            b.ins(move,sign)
-            if (self.is_win(b,sign) or self.is_win(b,xo.opp_sign(sign))):
-                return move
-            curr_move=self.minimax(b,depth,False,xo.opp_sign(sign))
-            if (curr_move > best_move):
-                best_move = curr_move
-                m=move
-            #print(curr_move,best_move,m)
-        return m #This should be the right move to do....
-    
-    
-    # *****************************************************************************************************#
-    
-    def minimax(self,board,depth,myTurn,sign):
-        """
-        :param depth:
-        :param myTurn:
-        :return:
-        """
-        #print(depth,end='\n')
-        if (self.is_win(board,xo.opp_sign(sign))):
-            if myTurn: 
-                return -(board.s**2+1) + depth
-            else:
-                return (board.s**2+1) - depth
-                
-        elif (board.is_full()):
-            return 0
-    
-        if (myTurn):
-            bestVal=-(2**700)
-            for move in board.empty: #empty - the empty squares at the board 
-                b = copy.deepcopy(board)
-                b.ins(move, sign)
-                value=self.minimax(b,depth+1,not myTurn, xo.opp_sign(sign))
-                #xo.opp_sign(sign) - if function for the opposite sign: x=>o and o=>x
-                bestVal = max([bestVal,value])
-    
-        else:
-            bestVal = (2**700)
-            for move in board.empty:
-                b = copy.deepcopy(board)
-                b.ins(move, sign) ## error xo.opp_sign(sign))
-                value = self.minimax(b, depth + 1, not myTurn, xo.opp_sign(sign))
-                #print("opp val: ",value)
-                bestVal = min([bestVal, value])
 
-        #print(depth, ' minimax returns ', bestVal, sign, myTurn, 'for:')
-        #print(board)
-        return bestVal
+def create_board():
+    return [' '] * 9
 
-    
-    # *****************************************************************************************************#
-    def is_win(self,board, sign):
-        """
-        The function gets a board and a sign.
-        :param board: The board.
-        :param sign: The sign (There are only two options: x/o).
-        :return: True if sign "wins" the board, i.e. some row or col or diag are all with then sing. Else return False.
-        """
-    
-        temp=board.s
-        wins = []  # The options to win at the game.
-        for i in range(1, temp + 1):
-            wins.append(board.get_col(i))
-            wins.append(board.get_row(i))
-        wins.append(board.get_diag1())
-        wins.append(board.get_diag2())
-    
-        for i in wins:
-            if (self.is_same(i, sign)):
-                return True
-        return False
-    
-    
-    
-    # *****************************************************************************************************#
-    def is_same(self, l, sign):
-        """
-        The function get a list l and returns if ALL the list have the same sign.
-        :param l: The list.
-        :param sign: The sign.
-        :return: True or false
-        """
-    
-        for i in l:
-            if (i != sign):
-                return False
-        return True
 
-# Main program        
-xo = XO()
-board = Board(3)
-tree = Tree()
-sign = 'O'
-human = False
-while not board.is_full() and not tree.is_win(board, sign):
-    sign = xo.opp_sign(sign)
-    human = not human
-    if human:
-        move = input('your move as {} (0-8):'.format(sign))
+def display_board(board):
+    print('\t-------------------------')
+    print('\t|       |       |       |')
+    print('\t|   ' + board[0] + '   |   ' +
+          board[1] + '   |   ' + board[2] + '   |')
+    print('\t|       |       |       |')
+    print('\t-------------------------')
+    print('\t|       |       |       |')
+    print('\t|   ' + board[3] + '   |   ' +
+          board[4] + '   |   ' + board[5] + '   |')
+    print('\t|       |       |       |')
+    print('\t-------------------------')
+    print('\t|       |       |       |')
+    print('\t|   ' + board[6] + '   |   ' +
+          board[7] + '   |   ' + board[8] + '   |')
+    print('\t|       |       |       |')
+    print('\t-------------------------')
+
+
+def winning(player, board):
+    return(
+        board[0] == player and board[1] == player and board[2] == player or
+        board[3] == player and board[4] == player and board[5] == player or
+        board[6] == player and board[7] == player and board[8] == player or
+        board[0] == player and board[3] == player and board[6] == player or
+        board[1] == player and board[4] == player and board[7] == player or
+        board[2] == player and board[5] == player and board[8] == player or
+        board[0] == player and board[4] == player and board[8] == player or
+        board[2] == player and board[4] == player and board[6] == player
+    )
+
+
+def board_isfull(board):
+    for i in range(1, 10):
+        if (board[i-1] == ' '):
+            return False
+    return True
+
+
+def isValid(board, pos):
+    return (pos > 0 and pos < 10) and board[pos-1] == ' '
+
+
+def player_turn(board, player):
+    pos = input('Your turn enter position : ')
+    while (not isValid(board, int(pos))):
+        pos = input('Please enter valid position : ')
+    board[int(pos) - 1] = player
+    display_board(board)
+
+
+def MiniMax(board, depth, isMax, computer, player):
+    if winning(computer, board):
+        return 1
+    if winning(player, board):
+        return -1
+    if board_isfull(board):
+        return 0
+
+    if isMax:
+        best = -100
+        for slot, value in enumerate(board):
+            if value == ' ':
+                board[slot] = computer
+                best = max(best, MiniMax(
+                    board, depth+1, False, computer, player))
+                board[slot] = ' '
+        return best
     else:
-        print('calculating...')
-        move = tree.find_best_move(board, 0, sign)
-    board.ins(int(move), sign)
-    print (board)
+        best = 100
+        for slot, value in enumerate(board):
+            if (value == ' '):
+                board[slot] = player
+                best = min(best, MiniMax(
+                    board, depth+1, True, computer, player))
+                board[slot] = ' '
+        return best
+
+
+def best_postion(board, computer, player):
+    best_pos = -1
+    best_weight = -1000
+    for slot, value in enumerate(board):
+        if (value == ' '):
+            board[slot] = computer
+            move_weight = MiniMax(board, 0, False, computer, player)
+            board[slot] = ' '
+            if (best_weight < move_weight):
+                best_weight = move_weight
+                best_pos = slot
+    return best_pos
+
+
+def computers_turn(board, computer, player):
+    pos = best_postion(board, computer, player) + 1
+    board[pos - 1] = computer
+    print('Computer has played its move at : ', pos)
+
+
+def available_slot(board):
+    return [i for i in range(0, 9) if (board[i] == ' ')]
+
+
+def tictactoe():
+    board = create_board()
+
+    player = input('Choose X | O : ')
+
+    while(not(player == 'X' or player == 'O')):
+        player = input('Enter valid option (X|O) : ')
+
+    if (player == 'X'):
+        computer = 'O'
+    else:
+        computer = 'X'
+
+    print('Player = '+player+' \computer = '+computer)
+    print('---New board---(index 1-9)')
+    display_board(board)
+
+    chance = randint(0, 1)
+    while(1):
+        if (board_isfull(board)):
+            print('Draw')
+            break
+        if (chance == 1):
+            player_turn(board, player)
+            if (winning(player, board)):
+                print('You ('+player+') won')
+                break
+            chance = 0
+        else:
+            computers_turn(board, computer, player)
+            display_board(board)
+            if (winning(computer, board)):
+                print('Player2 ('+computer+') won')
+                break
+            chance = 1
+
+    again = input('Want to play again (yes|no) : ')
+    if (again.lower() == 'yes' or again.lower() == 'y'):
+        tictactoe()
+
+
+tictactoe()
